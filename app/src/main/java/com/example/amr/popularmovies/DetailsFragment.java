@@ -2,12 +2,14 @@ package com.example.amr.popularmovies;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -36,6 +38,9 @@ public class DetailsFragment extends Fragment {
     int ID;
     List<String> listItems, list_trailers;
     List<String> listAuthors, list_reviews;
+    Button Btn_makeAsFavourite;
+    String Title, Year, Overview, Image2;
+    Double Rate;
     private ProgressDialog pdialog;
 
     @Override
@@ -55,6 +60,7 @@ public class DetailsFragment extends Fragment {
         pdialog.setCancelable(false);
         pdialog.setMessage("Loading. Please wait...");
 
+        Btn_makeAsFavourite = (Button) detailsFragment.findViewById(R.id.Btn_makeAsFavourite);
         tabLayout = (TabLayout) detailsFragment.findViewById(R.id.tab_layout);
         fragment_container = (LinearLayout) detailsFragment.findViewById(R.id.fragment_container);
         title_movie = (TextView) detailsFragment.findViewById(R.id.title_movie);
@@ -68,7 +74,7 @@ public class DetailsFragment extends Fragment {
         ID = sentBundle.getInt("ID");
         getVideosMoviesGET(ID);
 
-        String Title = sentBundle.getString("Title");
+        Title = sentBundle.getString("Title");
 
         boolean toolbarExist = sentBundle.getBoolean("Toolbar");
         if (toolbarExist) {
@@ -77,16 +83,16 @@ public class DetailsFragment extends Fragment {
             title_movie.setText(Title);
             title_movie.setVisibility(View.VISIBLE);
         }
-        String Year = sentBundle.getString("Year");
+        Year = sentBundle.getString("Year");
         yearView.setText("Year : " + Year);
 
-        Double Rate = sentBundle.getDouble("Rate");
+        Rate = sentBundle.getDouble("Rate");
         rate.setText("Rate : " + String.valueOf(Rate) + "/10");
 
-        String Overview = sentBundle.getString("Overview");
+        Overview = sentBundle.getString("Overview");
         DescriptionView.setText("Description : " + Overview);
 
-        String Image2 = sentBundle.getString("Image2");
+        Image2 = sentBundle.getString("Image2");
         Picasso.with(getActivity()).load(Image2).into(imageView);
 
         tabLayout.addTab(tabLayout.newTab().setText("Trailers"));
@@ -176,6 +182,5 @@ public class DetailsFragment extends Fragment {
                 pdialog.dismiss();
             }
         });
-
     }
 }
