@@ -86,8 +86,8 @@ public class DetailsFragment extends Fragment {
         String Overview = sentBundle.getString("Overview");
         DescriptionView.setText("Description : " + Overview);
 
-        String Image1 = sentBundle.getString("Image1");
-        Picasso.with(getActivity()).load(Image1).into(imageView);
+        String Image2 = sentBundle.getString("Image2");
+        Picasso.with(getActivity()).load(Image2).into(imageView);
 
         tabLayout.addTab(tabLayout.newTab().setText("Trailers"));
         tabLayout.addTab(tabLayout.newTab().setText("Reviews"));

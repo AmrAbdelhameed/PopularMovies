@@ -47,7 +47,7 @@ public class MainGridViewAdapter extends ArrayAdapter<MainResponse.ResultsBean> 
             holder = (ViewHolder) row.getTag();
         }
 
-        Picasso.with(mContext).load("https://image.tmdb.org/t/p/w320/" + mGridData.get(position).getPoster_path()).into(holder.Image1);
+        Picasso.with(mContext).load("https://image.tmdb.org/t/p/w154/" + mGridData.get(position).getPoster_path()).into(holder.Image1);
         return row;
     }
 

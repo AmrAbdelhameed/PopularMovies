@@ -92,8 +92,8 @@ public class MainFragment extends Fragment {
                             String Year = mGridData.get(position).getRelease_date();
                             Double Rate = mGridData.get(position).getVote_average();
                             String Overview = mGridData.get(position).getOverview();
-                            String Image1 = "https://image.tmdb.org/t/p/w320/" + mGridData.get(position).getPoster_path();
-                            String Image2 = "https://image.tmdb.org/t/p/w500/" + mGridData.get(position).getBackdrop_path();
+                            String Image1 = "https://image.tmdb.org/t/p/w154/" + mGridData.get(position).getPoster_path();
+                            String Image2 = "https://image.tmdb.org/t/p/w154/" + mGridData.get(position).getBackdrop_path();
 
                             mListener.setSelectedName(ID, Title, Year, Rate, Overview, Image1, Image2);
                         }
