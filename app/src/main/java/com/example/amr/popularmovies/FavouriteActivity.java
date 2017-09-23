@@ -6,18 +6,23 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 
-public class MainActivity extends AppCompatActivity implements TabletMood {
+public class FavouriteActivity extends AppCompatActivity implements TabletMoodFavourite {
     boolean mIsTwoPane = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_favourite);
 
-        MainFragment mMainFragment = new MainFragment();
-        mMainFragment.setNameListener(this);
-        getSupportFragmentManager().beginTransaction().add(R.id.flMain, mMainFragment, "").commit();
-        if (null != findViewById(R.id.flDetails)) {
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        setTitle("Favourite Movies");
+
+        FavouriteFragment favouriteFragment = new FavouriteFragment();
+        favouriteFragment.setNameListener(this);
+        getSupportFragmentManager().beginTransaction().add(R.id.flMain2, favouriteFragment, "").commit();
+        if (null != findViewById(R.id.flDetails2)) {
             mIsTwoPane = true;
         }
     }
@@ -29,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements TabletMood {
             Intent i = new Intent(this, DetailsActivity.class);
 
             Bundle b = new Bundle();
-            b.putBoolean("Favourite", false);
+            b.putBoolean("Favourite", true);
             b.putInt("ID", ID);
             b.putBoolean("Toolbar", true);
             b.putString("Title", Title);
@@ -46,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements TabletMood {
             DetailsFragment mDetailsFragment = new DetailsFragment();
 
             Bundle b = new Bundle();
-            b.putBoolean("Favourite", false);
+            b.putBoolean("Favourite", true);
             b.putInt("ID", ID);
             b.putBoolean("Toolbar", false);
             b.putString("Title", Title);
@@ -57,9 +62,16 @@ public class MainActivity extends AppCompatActivity implements TabletMood {
             b.putString("Image2", Image2);
             mDetailsFragment.setArguments(b);
 
-            getSupportFragmentManager().beginTransaction().replace(R.id.flDetails, mDetailsFragment, "").commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.flDetails2, mDetailsFragment, "").commit();
         }
     }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);

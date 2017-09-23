@@ -1,8 +1,9 @@
 package com.example.amr.popularmovies;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.amr.popularmovies.DataBase.DBHelper;
 import com.example.amr.popularmovies.Models.ReviewsResponse;
 import com.example.amr.popularmovies.Models.TrailersResponse;
 import com.example.amr.popularmovies.RetrofitAPIs.APIService;
@@ -30,7 +32,7 @@ import retrofit2.Response;
 
 
 public class DetailsFragment extends Fragment {
-    TextView title_movie, yearView, rate, DescriptionView;
+    TextView title_movie, yearView, rate, DescriptionView, makeAsFavourite;
     ImageView imageView;
     TabLayout tabLayout;
     LinearLayout fragment_container;
@@ -39,13 +41,17 @@ public class DetailsFragment extends Fragment {
     List<String> listItems, list_trailers;
     List<String> listAuthors, list_reviews;
     Button Btn_makeAsFavourite;
-    String Title, Year, Overview, Image2;
+    String Title, Year, Overview, Image1, Image2;
+    boolean toolbarExist, Favourite;
     Double Rate;
+    DBHelper dbHelper;
     private ProgressDialog pdialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View detailsFragment = inflater.inflate(R.layout.fragment_details, container, false);
+
+        dbHelper = new DBHelper(getContext());
 
         listItems = new ArrayList<String>();
         list_trailers = new ArrayList<String>();
@@ -60,6 +66,7 @@ public class DetailsFragment extends Fragment {
         pdialog.setCancelable(false);
         pdialog.setMessage("Loading. Please wait...");
 
+        makeAsFavourite = (TextView) detailsFragment.findViewById(R.id.makeAsFavourite);
         Btn_makeAsFavourite = (Button) detailsFragment.findViewById(R.id.Btn_makeAsFavourite);
         tabLayout = (TabLayout) detailsFragment.findViewById(R.id.tab_layout);
         fragment_container = (LinearLayout) detailsFragment.findViewById(R.id.fragment_container);
@@ -71,12 +78,14 @@ public class DetailsFragment extends Fragment {
 
         Bundle sentBundle = getArguments();
 
+        Favourite = sentBundle.getBoolean("Favourite");
+
         ID = sentBundle.getInt("ID");
         getVideosMoviesGET(ID);
 
         Title = sentBundle.getString("Title");
 
-        boolean toolbarExist = sentBundle.getBoolean("Toolbar");
+        toolbarExist = sentBundle.getBoolean("Toolbar");
         if (toolbarExist) {
             ((DetailsActivity) getActivity()).setTitle(Title);
         } else {
@@ -92,8 +101,52 @@ public class DetailsFragment extends Fragment {
         Overview = sentBundle.getString("Overview");
         DescriptionView.setText("Description : " + Overview);
 
+        Image1 = sentBundle.getString("Image1");
+
         Image2 = sentBundle.getString("Image2");
         Picasso.with(getActivity()).load(Image2).into(imageView);
+
+        if (dbHelper.checkmovie(ID).getCount() == 0) {
+            Btn_makeAsFavourite.setBackgroundResource(R.drawable.ic_favorite_border_black_24dp);
+            makeAsFavourite.setText("Make As Favourite");
+        } else {
+            Btn_makeAsFavourite.setBackgroundResource(R.drawable.ic_favorite_black_24dp);
+            makeAsFavourite.setText("Make As UnFavourite");
+        }
+
+        Btn_makeAsFavourite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (dbHelper.checkmovie(ID).getCount() > 0) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage("UnFavourite it ?")
+                            .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dbHelper.deleterow(Title);
+                                    Toast.makeText(getActivity(), "UnFavourite Successfully", Toast.LENGTH_SHORT).show();
+                                    Btn_makeAsFavourite.setBackgroundResource(R.drawable.ic_favorite_border_black_24dp);
+                                    makeAsFavourite.setText("Make As Favourite");
+                                    if (toolbarExist)
+                                        ((DetailsActivity) getActivity()).finish();
+
+                                }
+                            }).setNegativeButton("no", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                        }
+                    });
+                    AlertDialog d = builder.create();
+                    d.setTitle("Are you sure");
+                    d.show();
+                } else {
+                    if (dbHelper.checkmovie(ID).getCount() == 0) {
+                        dbHelper.addMovie(ID, Image1, Image2, Title, Rate, Year, Overview);
+                        Toast.makeText(getActivity(), "Favourite Successfully", Toast.LENGTH_SHORT).show();
+                        Btn_makeAsFavourite.setBackgroundResource(R.drawable.ic_favorite_black_24dp);
+                        makeAsFavourite.setText("Make As UnFavourite");
+                    }
+                }
+            }
+        });
 
         tabLayout.addTab(tabLayout.newTab().setText("Trailers"));
         tabLayout.addTab(tabLayout.newTab().setText("Reviews"));
@@ -102,8 +155,12 @@ public class DetailsFragment extends Fragment {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (tab.getPosition() == 0) {
+                    if (listItems.size() == 0)
+                        Toast.makeText(getActivity(), "Nothing to show", Toast.LENGTH_SHORT).show();
                     replaceFragment(new TrailersFragment(listItems, list_trailers));
                 } else {
+                    if (listAuthors.size() == 0)
+                        Toast.makeText(getActivity(), "Nothing to show", Toast.LENGTH_SHORT).show();
                     replaceFragment(new ReviewsFragment(listAuthors, list_reviews));
                 }
             }
@@ -146,6 +203,8 @@ public class DetailsFragment extends Fragment {
                         listItems.add("Trailer " + (i + 1));
                         list_trailers.add(trailersResponseResults.get(i).getKey());
                     }
+                    if (listItems.size() == 0)
+                        Toast.makeText(getActivity(), "Nothing to show", Toast.LENGTH_SHORT).show();
                     replaceFragment(new TrailersFragment(listItems, list_trailers));
                 }
                 pdialog.dismiss();

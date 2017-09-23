@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,6 +20,7 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import com.example.amr.popularmovies.Adapters.MainGridViewAdapter;
+import com.example.amr.popularmovies.DataBase.MovieProvider;
 import com.example.amr.popularmovies.Models.MainResponse;
 import com.example.amr.popularmovies.RetrofitAPIs.APIService;
 import com.example.amr.popularmovies.RetrofitAPIs.ApiUtils;
@@ -148,6 +151,10 @@ public class MainFragment extends Fragment {
 
             ((MainActivity) getActivity()).setTitle(Titletheme);
             getMoviesGET(theme);
+            return true;
+        } else if (id == R.id.action_favourite) {
+            Intent i = new Intent(getActivity(), FavouriteActivity.class);
+            startActivity(i);
             return true;
         }
 
